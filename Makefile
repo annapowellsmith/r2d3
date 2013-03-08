@@ -1,6 +1,8 @@
 # See the README for installation instructions.
+NODE_PATH ?= ./node_modules
+JS_UGLIFY = $(NODE_PATH)/uglify-js/bin/uglifyjs
+JS_TESTER = $(NODE_PATH)/vows/bin/vows
 LOCALE ?= en_US
-
 
 all: \
 	r2d3.v2.js \
@@ -26,14 +28,14 @@ all: \
 	lib/d3/src/end.js
 
 r2d3.core.js: \
+	lib/d3/src/core/core.js \
+	lib/d3/src/core/format-$(LOCALE).js \
 	lib/d3/src/compat/date.js \
 	lib/d3/src/compat/style.js \
-	lib/d3/src/core/core.js \
 	lib/d3/src/core/class.js \
 	lib/d3/src/core/array.js \
 	lib/d3/src/core/map.js \
 	lib/d3/src/core/identity.js \
-	lib/d3/src/core/this.js \
 	lib/d3/src/core/true.js \
 	lib/d3/src/core/functor.js \
 	lib/d3/src/core/rebind.js \
@@ -48,23 +50,21 @@ r2d3.core.js: \
 	lib/d3/src/core/number.js \
 	lib/d3/src/core/sum.js \
 	lib/d3/src/core/quantile.js \
+	lib/d3/src/core/shuffle.js \
 	lib/d3/src/core/transpose.js \
 	lib/d3/src/core/zip.js \
 	lib/d3/src/core/bisect.js \
-	lib/d3/src/core/first.js \
-	lib/d3/src/core/last.js \
 	lib/d3/src/core/nest.js \
 	lib/d3/src/core/keys.js \
 	lib/d3/src/core/values.js \
 	lib/d3/src/core/entries.js \
 	lib/d3/src/core/permute.js \
 	lib/d3/src/core/merge.js \
-	lib/d3/src/core/split.js \
 	lib/d3/src/core/collapse.js \
 	lib/d3/src/core/range.js \
 	lib/d3/src/core/requote.js \
 	lib/d3/src/core/round.js \
-	src/core/xhr.js \
+	lib/d3/src/core/xhr.js \
 	lib/d3/src/core/text.js \
 	lib/d3/src/core/json.js \
 	lib/d3/src/core/html.js \
@@ -75,23 +75,25 @@ r2d3.core.js: \
 	lib/d3/src/core/formatPrefix.js \
 	lib/d3/src/core/ease.js \
 	lib/d3/src/core/event.js \
+	lib/d3/src/core/transform.js \
 	lib/d3/src/core/interpolate.js \
 	lib/d3/src/core/uninterpolate.js \
+	lib/d3/src/core/color.js \
 	lib/d3/src/core/rgb.js \
 	lib/d3/src/core/hsl.js \
 	lib/d3/src/core/hcl.js \
 	lib/d3/src/core/lab.js \
 	lib/d3/src/core/xyz.js \
-	src/core/selection.js \
+	lib/d3/src/core/selection.js \
 	lib/d3/src/core/selection-select.js \
 	lib/d3/src/core/selection-selectAll.js \
 	lib/d3/src/core/selection-attr.js \
 	lib/d3/src/core/selection-classed.js \
-	src/core/selection-style.js \
+	lib/d3/src/core/selection-style.js \
 	lib/d3/src/core/selection-property.js \
-	src/core/selection-text.js \
+	lib/d3/src/core/selection-text.js \
 	lib/d3/src/core/selection-html.js \
-	src/core/selection-append.js \
+	lib/d3/src/core/selection-append.js \
 	lib/d3/src/core/selection-insert.js \
 	lib/d3/src/core/selection-remove.js \
 	lib/d3/src/core/selection-data.js \
@@ -99,7 +101,7 @@ r2d3.core.js: \
 	lib/d3/src/core/selection-filter.js \
 	lib/d3/src/core/selection-order.js \
 	lib/d3/src/core/selection-sort.js \
-	src/core/selection-on.js \
+	lib/d3/src/core/selection-on.js \
 	lib/d3/src/core/selection-each.js \
 	lib/d3/src/core/selection-call.js \
 	lib/d3/src/core/selection-empty.js \
@@ -116,13 +118,13 @@ r2d3.core.js: \
 	lib/d3/src/core/transition-style.js \
 	lib/d3/src/core/transition-text.js \
 	lib/d3/src/core/transition-remove.js \
+	lib/d3/src/core/transition-ease.js \
 	lib/d3/src/core/transition-delay.js \
 	lib/d3/src/core/transition-duration.js \
 	lib/d3/src/core/transition-each.js \
 	lib/d3/src/core/transition-transition.js \
-	lib/d3/src/core/tween.js \
+	lib/d3/src/core/transition-tween.js \
 	lib/d3/src/core/timer.js \
-	src/core/transform.js \
 	lib/d3/src/core/mouse.js \
 	lib/d3/src/core/touches.js \
 	lib/d3/src/core/noop.js
@@ -153,8 +155,6 @@ r2d3.svg.js: \
 	lib/d3/src/svg/chord.js \
 	lib/d3/src/svg/diagonal.js \
 	lib/d3/src/svg/diagonal-radial.js \
-	lib/d3/src/svg/mouse.js \
-	lib/d3/src/svg/touches.js \
 	lib/d3/src/svg/symbol.js \
 	lib/d3/src/svg/axis.js \
 	lib/d3/src/svg/brush.js
@@ -188,17 +188,40 @@ r2d3.layout.js: \
 
 r2d3.geo.js: \
 	lib/d3/src/geo/geo.js \
-	lib/d3/src/geo/azimuthal.js \
+	lib/d3/src/geo/stream.js \
+	lib/d3/src/geo/spherical.js \
+	lib/d3/src/geo/cartesian.js \
+	lib/d3/src/geo/resample.js \
+	lib/d3/src/geo/albers-usa.js \
 	lib/d3/src/geo/albers.js \
-	lib/d3/src/geo/bonne.js \
-	lib/d3/src/geo/equirectangular.js \
-	lib/d3/src/geo/mercator.js \
-	lib/d3/src/geo/type.js \
-	lib/d3/src/geo/path.js \
+	lib/d3/src/geo/azimuthal-equal-area.js \
+	lib/d3/src/geo/azimuthal-equidistant.js \
 	lib/d3/src/geo/bounds.js \
+	lib/d3/src/geo/centroid.js \
 	lib/d3/src/geo/circle.js \
+	lib/d3/src/geo/clip.js \
+	lib/d3/src/geo/clip-antimeridian.js \
+	lib/d3/src/geo/clip-circle.js \
+	lib/d3/src/geo/compose.js \
+	lib/d3/src/geo/equirectangular.js \
+	lib/d3/src/geo/gnomonic.js \
+	lib/d3/src/geo/graticule.js \
+	lib/d3/src/geo/haversin.js \
+	lib/d3/src/geo/interpolate.js \
 	lib/d3/src/geo/greatArc.js \
-	lib/d3/src/geo/greatCircle.js
+	lib/d3/src/geo/mercator.js \
+	lib/d3/src/geo/orthographic.js \
+	lib/d3/src/geo/path.js \
+	lib/d3/src/geo/path-buffer.js \
+	lib/d3/src/geo/path-context.js \
+	lib/d3/src/geo/path-area.js \
+	lib/d3/src/geo/path-centroid.js \
+	lib/d3/src/geo/area.js \
+	lib/d3/src/geo/centroid.js \
+	lib/d3/src/geo/projection.js \
+	lib/d3/src/geo/rotation.js \
+	lib/d3/src/geo/stereographic.js \
+	lib/d3/src/geo/azimuthal.js
 
 r2d3.dsv.js: \
 	lib/d3/src/dsv/csv.js \
@@ -224,13 +247,11 @@ r2d3.time.js: \
 
 r2d3.geom.js: \
 	lib/d3/src/geom/geom.js \
-	lib/d3/src/geom/contour.js \
 	lib/d3/src/geom/hull.js \
 	lib/d3/src/geom/polygon.js \
 	lib/d3/src/geom/voronoi.js \
 	lib/d3/src/geom/delaunay.js \
 	lib/d3/src/geom/quadtree.js
-
 
 %.min.js: %.js Makefile
 	@rm -f $@
@@ -241,6 +262,15 @@ r2d3%.js: Makefile
 	cat $(filter %.js,$^) > $@
 	@chmod a-w $@
 
+lib/d3/src/core/format-$(LOCALE).js: lib/d3/src/locale.js lib/d3/src/core/format-locale.js
+        LC_NUMERIC=$(LOCALE) locale -ck LC_NUMERIC | node lib/d3/src/locale.js lib/d3/src/core/format-locale.js > $@
+
+lib/d3/src/time/format-$(LOCALE).js: lib/d3/src/locale.js lib/d3/src/time/format-locale.js
+        LC_TIME=$(LOCALE) locale -ck LC_TIME | node lib/d3/src/locale.js lib/d3/src/time/format-locale.js > $@
+
+.INTERMEDIATE: \
+        lib/d3/src/core/format-$(LOCALE).js \
+        lib/d3/src/time/format-$(LOCALE).js
 
 clean:
 	rm -f d3*.js
